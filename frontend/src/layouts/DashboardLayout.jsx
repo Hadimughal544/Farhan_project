@@ -1,34 +1,59 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function DashboardLayout({ children }) {
   const { user, logout } = useAuth();
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-brand-50 to-blue-50 p-5 md:p-8">
-      <div className="mx-auto max-w-7xl rounded-3xl border border-white/60 bg-white/85 p-6 shadow-soft backdrop-blur md:p-8">
-        <header className="mb-8 flex flex-col gap-5 border-b border-slate-200/90 pb-6 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-white">
+      <header className="w-full border-b bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <div>
-            <h1 className="font-heading text-2xl font-bold text-slate-900 md:text-3xl">Student Dashboard</h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Welcome back, <span className="font-semibold text-slate-700">{user?.full_name}</span>. Your admission journey is all in one place.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700 md:inline-flex">
-              {user?.role || "student"}
-            </span>
-            <Link
-              to="/login"
-              onClick={logout}
-              className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:translate-y-[-1px] hover:bg-brand-700"
-            >
-              Logout
+            <Link to="/dashboard" className="text-lg font-bold text-slate-900">
+              Admission Advisor
             </Link>
+            <p className="text-xs text-slate-500">Welcome, {user?.full_name}</p>
           </div>
-        </header>
-        {children}
-      </div>
+
+          <nav className="flex items-center gap-3">
+            <Link
+              to="/dashboard"
+              className={`px-3 py-2 text-sm font-medium ${isActive("/dashboard") ? "text-brand-700" : "text-slate-600"}`}
+            >
+              Dashboard
+            </Link>
+            <Link to="/predict" className={`px-3 py-2 text-sm font-medium ${isActive("/predict") ? "text-brand-700" : "text-slate-600"}`}>
+              Prediction
+            </Link>
+            {user?.role === "admin" ? (
+              <Link
+                to="/admin/dashboard"
+                className={`px-3 py-2 text-sm font-medium ${location.pathname.startsWith("/admin") ? "text-brand-700" : "text-slate-600"}`}
+              >
+                Admin
+              </Link>
+            ) : null}
+
+            <button onClick={logout} className="ml-4 rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
+              Logout
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1 w-full">
+        <div className="mx-auto max-w-7xl px-4 py-8">{children}</div>
+      </main>
+
+      <footer className="w-full border-t bg-white/90">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 text-sm text-slate-600">
+          <div>© {new Date().getFullYear()} Admission Advisor — Built for Pakistan universities</div>
+          <div>Support · Privacy · Terms</div>
+        </div>
+      </footer>
     </div>
   );
 }
