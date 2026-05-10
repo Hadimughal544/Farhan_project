@@ -55,3 +55,26 @@ class UserService:
         db.commit()
         db.refresh(user)
         return user
+
+    @staticmethod
+    def list_users(db: Session) -> list[User]:
+        return db.query(User).order_by(User.created_at.desc()).all()
+
+    @staticmethod
+    def update_user_role(db: Session, user_id: int, role: str) -> User | None:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return None
+        user.role = role
+        db.commit()
+        db.refresh(user)
+        return user
+
+    @staticmethod
+    def delete_user(db: Session, user_id: int) -> bool:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return False
+        db.delete(user)
+        db.commit()
+        return True
