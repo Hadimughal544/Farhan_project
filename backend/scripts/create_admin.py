@@ -1,5 +1,5 @@
 """Simple script to create an admin user.
-Usage: python scripts/create_admin.py --email admin@example.com --password secret
+Usage: python scripts/create_admin.py --email farhanadmin@gmail.com --password farhan1122
 """
 import argparse
 import sys
