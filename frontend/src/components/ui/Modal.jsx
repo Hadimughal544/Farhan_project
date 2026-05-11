@@ -26,18 +26,18 @@ export default function Modal({ open, title, description, children, onClose, foo
     >
       <button
         type="button"
-        className="absolute inset-0 animate-fade-in bg-slate-900/40 backdrop-blur-[2px]"
+        className="absolute inset-0 animate-fade-in bg-slate-900/45 backdrop-blur-[3px]"
         onClick={onClose}
         aria-label="Close dialog"
       />
-      <div className="relative flex max-h-[min(92vh,880px)] w-full max-w-lg animate-slide-up flex-col rounded-t-2xl border border-slate-200/80 bg-white shadow-2xl sm:max-w-2xl sm:rounded-2xl">
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+      <div className="relative flex max-h-[min(92vh,880px)] w-full max-w-lg animate-slide-up flex-col rounded-t-3xl border border-slate-200/80 bg-white shadow-2xl sm:max-w-2xl sm:rounded-3xl">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-6 py-5 sm:px-7">
           <div>
-            <h2 id="modal-title" className="font-heading text-lg font-semibold text-slate-900">
+            <h2 id="modal-title" className="font-heading text-xl font-semibold text-slate-900">
               {title}
             </h2>
             {description ? (
-              <p className="mt-1 text-sm text-slate-600">{description}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{description}</p>
             ) : null}
           </div>
           <button
@@ -51,9 +51,9 @@ export default function Modal({ open, title, description, children, onClose, foo
             </svg>
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-7">{children}</div>
         {footer ? (
-          <div className="shrink-0 border-t border-slate-100 bg-slate-50/80 px-5 py-4 sm:px-6">{footer}</div>
+          <div className="shrink-0 border-t border-slate-100 bg-slate-50/80 px-6 py-5 sm:px-7">{footer}</div>
         ) : null}
       </div>
     </div>

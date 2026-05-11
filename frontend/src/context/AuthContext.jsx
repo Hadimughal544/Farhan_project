@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { getMyProfile, loginUser, registerUser, updateMyProfile } from "../services/authService";
+import { uploadAvatar as uploadAvatarService } from "../services/authService";
 
 export const AuthContext = createContext(null);
 
@@ -38,6 +39,12 @@ export function AuthProvider({ children }) {
     return createdUser;
   }, []);
 
+  const uploadAvatar = useCallback(async (file) => {
+    const updated = await uploadAvatarService(file);
+    setUser(updated);
+    return updated;
+  }, []);
+
   const login = useCallback(async (payload) => {
     const data = await loginUser(payload);
     localStorage.setItem("access_token", data.access_token);
@@ -57,11 +64,12 @@ export function AuthProvider({ children }) {
       loading,
       login,
       register,
+      uploadAvatar,
       updateProfile,
       logout,
       isAuthenticated: Boolean(user),
     }),
-    [user, loading, login, register, updateProfile, logout]
+    [user, loading, login, register, uploadAvatar, updateProfile, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

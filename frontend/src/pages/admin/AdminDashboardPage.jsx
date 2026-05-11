@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAdminUniversities, getAdminUsers } from "../../services/adminService";
+import { getMeritTrends } from "../../services/advancedService";
 
 function DistributionChart({ title, subtitle, items }) {
   const max = Math.max(...items.map((i) => i.value), 1);
@@ -32,6 +33,7 @@ export default function AdminDashboardPage() {
   const [universities, setUniversities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [meritTrendCount, setMeritTrendCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,10 +41,11 @@ export default function AdminDashboardPage() {
       setLoading(true);
       setError("");
       try {
-        const [u, uni] = await Promise.all([getAdminUsers(), getAdminUniversities()]);
+        const [u, uni, trends] = await Promise.all([getAdminUsers(), getAdminUniversities(), getMeritTrends()]);
         if (!cancelled) {
           setUsers(u);
           setUniversities(uni);
+          setMeritTrendCount((trends || []).length);
         }
       } catch (e) {
         if (!cancelled) {
@@ -137,6 +140,7 @@ export default function AdminDashboardPage() {
           { label: "Catalog records", value: stats.totalUniversities, hint: "Institutions available to matching" },
           { label: "Open admissions", value: stats.openAdmissions, hint: "Flagged as accepting intake" },
           { label: "Aid-eligible records", value: stats.withScholarships, hint: "Scholarship program indicated" },
+          { label: "Merit trend rows", value: meritTrendCount, hint: "Historical trend records stored" },
         ].map((card) => (
           <article key={card.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{card.label}</p>

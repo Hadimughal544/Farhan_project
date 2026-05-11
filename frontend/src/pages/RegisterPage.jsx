@@ -17,6 +17,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
   });
+  const [gender, setGender] = useState("unspecified");
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -52,7 +53,7 @@ export default function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register(form);
+      await register({ ...form, gender });
       toast.success("Account created. Please sign in.");
       navigate("/login");
     } catch (error) {
@@ -98,6 +99,21 @@ export default function RegisterPage() {
             placeholder="Minimum 8 characters"
             error={errors.password}
           />
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Gender (optional)</label>
+            <select
+              name="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+            >
+              <option value="unspecified">Prefer not to say</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
           {serverError ? <p className="mb-4 text-sm text-red-600">{serverError}</p> : null}
 

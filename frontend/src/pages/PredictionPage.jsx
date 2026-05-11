@@ -5,6 +5,7 @@ import TextInput from "../components/TextInput";
 import UniversityCard from "../components/UniversityCard";
 import Button from "../components/ui/Button";
 import { predictAdmission } from "../services/predictionService";
+import { saveUniversity } from "../services/advancedService";
 import { useAuth } from "../hooks/useAuth";
 
 const STEPS = [
@@ -88,6 +89,10 @@ export default function PredictionPage() {
     if (!list?.length) return null;
     return list[0];
   }, [result]);
+
+  const safeUniversities = result?.safe_universities || [];
+  const moderateUniversities = result?.moderate_universities || [];
+  const dreamUniversities = result?.dream_universities || [];
 
   const validateStep = (s) => {
     const nextErrors = { ...errors };
@@ -203,6 +208,15 @@ export default function PredictionPage() {
       toast.error(err?.response?.data?.detail || "Assessment could not be generated.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onSaveUniversity = async (uni) => {
+    try {
+      await saveUniversity(uni.id, `Saved from assessment with ${uni.admission_probability}% chance`);
+      toast.success(`${uni.name} saved to your dashboard.`);
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Could not save university.");
     }
   };
 
@@ -507,6 +521,56 @@ export default function PredictionPage() {
                     </p>
                   </section>
                 )}
+
+                <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+                  <h3 className="font-heading text-lg font-semibold text-slate-900">Admission Probability Breakdown</h3>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Universities are grouped into Safe, Moderate, and Dream categories based on your profile fit.
+                  </p>
+
+                  <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                    {[
+                      { title: "Safe Universities", color: "emerald", items: safeUniversities },
+                      { title: "Moderate Chance", color: "sky", items: moderateUniversities },
+                      { title: "Dream Universities", color: "amber", items: dreamUniversities },
+                    ].map((group) => (
+                      <article key={group.title} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <h4 className="font-semibold text-slate-900">{group.title}</h4>
+                        <div className="mt-3 space-y-2">
+                          {group.items.length === 0 ? <p className="text-xs text-slate-500">No universities in this group.</p> : null}
+                          {group.items.map((uni) => (
+                            <div key={uni.id} className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-sm font-medium text-slate-900">{uni.name}</p>
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                    group.color === "emerald"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : group.color === "sky"
+                                        ? "bg-sky-100 text-sky-800"
+                                        : "bg-amber-100 text-amber-800"
+                                  }`}
+                                >
+                                  {uni.admission_probability}%
+                                </span>
+                              </div>
+                              <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                                <span>Tier {uni.tier} · {uni.type}</span>
+                                <button
+                                  type="button"
+                                  className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                  onClick={() => onSaveUniversity(uni)}
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
               </div>
             ) : (
               <div className="flex min-h-[320px] flex-col justify-center rounded-xl border border-slate-200 bg-white p-8 shadow-card lg:min-h-[480px]">

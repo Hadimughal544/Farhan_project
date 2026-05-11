@@ -32,3 +32,8 @@ export const updateAdminUserRole = async (id, role) => {
 export const deleteAdminUser = async (id) => {
   await api.delete(`/admin/users/${id}`);
 };
+
+export const sendAdminUsersEmail = async (payload) => {
+  const response = await api.post("/admin/users/send-email", payload);
+  return response.data;
+};

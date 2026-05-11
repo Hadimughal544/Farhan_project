@@ -49,9 +49,13 @@ export default function UserMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
       >
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-[11px] font-bold text-white">
-          {initials(user?.full_name)}
-        </span>
+        {user?.avatar_url ? (
+          <img src={user.avatar_url} alt="avatar" className="h-8 w-8 rounded-lg object-cover" />
+        ) : (
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-[11px] font-bold text-white">
+            {initials(user?.full_name)}
+          </span>
+        )}
         <span className="hidden max-w-[160px] truncate sm:block">{user?.full_name || "User"}</span>
         <svg className={`h-4 w-4 text-slate-500 transition ${open ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none">
           <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

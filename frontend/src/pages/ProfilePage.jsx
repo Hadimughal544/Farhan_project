@@ -19,7 +19,7 @@ function initials(name) {
 }
 
 export default function ProfilePage() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, uploadAvatar } = useAuth();
 
   const joinedLabel = useMemo(() => {
     if (!user?.created_at) return "—";
@@ -45,6 +45,17 @@ export default function ProfilePage() {
       email: user?.email || "",
     });
   }, [user?.full_name, user?.email]);
+
+  const onAvatarChange = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    try {
+      const updated = await uploadAvatar(f);
+      toast.success("Avatar updated");
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Avatar upload failed.");
+    }
+  };
 
   const onChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
   const onPwChange = (e) => setPw((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -116,8 +127,14 @@ export default function ProfilePage() {
         <section className="grid gap-6 lg:grid-cols-5">
           <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
             <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-xl bg-slate-900 text-sm font-bold text-white">
-                {initials(user?.full_name)}
+              <div className="relative">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="avatar" className="h-14 w-14 rounded-xl object-cover" />
+                ) : (
+                  <div className="grid h-14 w-14 place-items-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+                    {initials(user?.full_name)}
+                  </div>
+                )}
               </div>
               <div className="min-w-0">
                 <p className="truncate font-heading text-lg font-semibold text-slate-900">{user?.full_name}</p>
@@ -134,6 +151,18 @@ export default function ProfilePage() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Member since</p>
                 <p className="mt-1 font-medium text-slate-900">{joinedLabel}</p>
               </div>
+              {editMode ? (
+                <label className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 cursor-pointer transition hover:bg-slate-50">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={onAvatarChange}
+                    className="hidden"
+                    aria-label="Upload avatar"
+                  />
+                  📷 Upload Avatar
+                </label>
+              ) : null}
             </div>
           </article>
 
