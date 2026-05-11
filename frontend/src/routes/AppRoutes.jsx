@@ -4,12 +4,14 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import PredictionPage from "../pages/PredictionPage";
+import ProfilePage from "../pages/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import LandingAfterLogin from "../pages/LandingAfterLogin";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminUniversitiesPage from "../pages/admin/AdminUniversitiesPage";
+import AdminChatbotPage from "../pages/admin/AdminChatbotPage";
 
 export default function AppRoutes() {
   return (
@@ -45,12 +47,21 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
         <Route path="universities" element={<AdminUniversitiesPage />} />
+        <Route path="chatbot" element={<AdminChatbotPage />} />
       </Route>
       <Route
         path="/predict"
         element={
           <ProtectedRoute>
             <PredictionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />

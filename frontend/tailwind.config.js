@@ -23,7 +23,23 @@ export default {
       },
       boxShadow: {
         soft: "0 10px 30px rgba(14, 42, 71, 0.12)",
-      }
+        card: "0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06)",
+        lift: "0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.08)",
+      },
+      keyframes: {
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.25s ease-out forwards",
+        "slide-up": "slide-up 0.35s ease-out forwards",
+      },
     },
   },
   plugins: [],

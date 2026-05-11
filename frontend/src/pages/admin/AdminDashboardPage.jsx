@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAdminUniversities, getAdminUsers } from "../../services/adminService";
 
-function BarChart({ title, subtitle, items }) {
+function DistributionChart({ title, subtitle, items }) {
   const max = Math.max(...items.map((i) => i.value), 1);
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="font-heading text-base font-semibold text-slate-900">{title}</h3>
       {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
       <div className="mt-5 space-y-4">
         {items.map((row) => (
           <div key={row.label}>
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-800">{row.label}</span>
-              <span className="text-slate-500">{row.value}</span>
+              <span className="tabular-nums text-slate-500">{row.value}</span>
             </div>
-            <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-brand-600 to-brand-400 transition-all"
+                className="h-full rounded-full bg-slate-800 transition-all duration-500"
                 style={{ width: `${Math.round((row.value / max) * 100)}%` }}
               />
             </div>
@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
         }
       } catch (e) {
         if (!cancelled) {
-          setError(e?.response?.data?.detail || "Could not load admin metrics.");
+          setError(e?.response?.data?.detail || "Metrics could not be loaded.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -96,9 +96,9 @@ export default function AdminDashboardPage() {
       openAdmissions,
       withScholarships,
       tierRows: [
-        { label: "Tier 1 (High chance fit)", value: tierCounts[1] },
-        { label: "Tier 2 (Medium chance fit)", value: tierCounts[2] },
-        { label: "Tier 3 (Low chance fit)", value: tierCounts[3] },
+        { label: "Tier I institutions", value: tierCounts[1] },
+        { label: "Tier II institutions", value: tierCounts[2] },
+        { label: "Tier III institutions", value: tierCounts[3] },
       ],
       typeRows: [
         { label: "Government", value: typeCounts.Government },
@@ -110,55 +110,60 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-        <p className="text-sm text-slate-600">Loading dashboard metrics...</p>
+      <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-slate-200 bg-white">
+        <p className="text-sm text-slate-600">Loading operational metrics…</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Platform activity at a glance — user growth, university coverage, and admissions availability.
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Administration</p>
+        <h1 className="mt-1 font-heading text-2xl font-semibold text-slate-900 md:text-3xl">Executive overview</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          Consolidated view of enrollment into the platform and the health of your institutional catalog.
         </p>
-        {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+        {error ? <p className="mt-2 text-sm font-medium text-red-600">{error}</p> : null}
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "Total users", value: stats.totalUsers, hint: `${stats.students} students · ${stats.admins} admins` },
-          { label: "Universities", value: stats.totalUniversities, hint: "Catalog size in database" },
-          { label: "Open admissions", value: stats.openAdmissions, hint: "Currently accepting applications" },
-          { label: "Scholarship programs", value: stats.withScholarships, hint: "Flagged for financial aid" },
+          {
+            label: "Provisioned accounts",
+            value: stats.totalUsers,
+            hint: `${stats.students} learners · ${stats.admins} administrators`,
+          },
+          { label: "Catalog records", value: stats.totalUniversities, hint: "Institutions available to matching" },
+          { label: "Open admissions", value: stats.openAdmissions, hint: "Flagged as accepting intake" },
+          { label: "Aid-eligible records", value: stats.withScholarships, hint: "Scholarship program indicated" },
         ].map((card) => (
-          <article key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">{card.label}</p>
-            <p className="mt-1 font-heading text-3xl font-bold text-slate-900">{card.value}</p>
+          <article key={card.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{card.label}</p>
+            <p className="mt-2 font-heading text-3xl font-semibold tabular-nums text-slate-900">{card.value}</p>
             <p className="mt-1 text-xs text-slate-600">{card.hint}</p>
           </article>
         ))}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <BarChart
-          title="Universities by tier"
-          subtitle="Tiers align with model output: High → 1, Medium → 2, Low → 3."
+        <DistributionChart
+          title="Catalog by tier"
+          subtitle="Distribution of catalog entries across institutional tier metadata."
           items={stats.tierRows}
         />
-        <BarChart title="Universities by type" subtitle="Government vs private split." items={stats.typeRows} />
+        <DistributionChart title="Catalog by sector" subtitle="Government versus private sector coverage." items={stats.typeRows} />
       </section>
 
       <section>
         {stats.signupRows.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-600">
-            No user signup timeline yet — data will appear as users register.
+          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm text-slate-600">
+            No registration timeline yet. Data will populate as accounts are provisioned.
           </div>
         ) : (
-          <BarChart
-            title="New user signups (by month)"
-            subtitle="Based on account created_at timestamps."
+          <DistributionChart
+            title="New account registrations"
+            subtitle="Monthly volume based on account creation timestamps."
             items={stats.signupRows}
           />
         )}

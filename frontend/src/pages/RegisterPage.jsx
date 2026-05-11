@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import AuthCard from "../components/AuthCard";
 import TextInput from "../components/TextInput";
 import AuthLayout from "../layouts/AuthLayout";
 import { useAuth } from "../hooks/useAuth";
+import Button from "../components/ui/Button";
+import PasswordInput from "../components/ui/PasswordInput";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -50,9 +53,11 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(form);
+      toast.success("Account created. Please sign in.");
       navigate("/login");
     } catch (error) {
       setServerError(error?.response?.data?.detail || "Registration failed.");
+      toast.error(error?.response?.data?.detail || "Registration failed.");
     } finally {
       setSubmitting(false);
     }
@@ -64,7 +69,7 @@ export default function RegisterPage() {
         title="Create your account"
         subtitle="Join FutureCampus to get AI-guided university and admission planning."
       >
-        <form onSubmit={onSubmit} noValidate>
+        <form onSubmit={onSubmit} noValidate className="space-y-4">
           <TextInput
             label="Full Name"
             name="full_name"
@@ -85,10 +90,9 @@ export default function RegisterPage() {
             error={errors.email}
           />
 
-          <TextInput
+          <PasswordInput
             label="Password"
             name="password"
-            type="password"
             value={form.password}
             onChange={onChange}
             placeholder="Minimum 8 characters"
@@ -97,13 +101,9 @@ export default function RegisterPage() {
 
           {serverError ? <p className="mb-4 text-sm text-red-600">{serverError}</p> : null}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white transition hover:translate-y-[-1px] hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? "Creating account..." : "Register"}
-          </button>
+          <Button type="submit" disabled={submitting} className="w-full py-3">
+            {submitting ? "Submitting…" : "Create account"}
+          </Button>
         </form>
 
         <p className="mt-6 text-sm text-slate-600">

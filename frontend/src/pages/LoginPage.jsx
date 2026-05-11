@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import AuthCard from "../components/AuthCard";
 import TextInput from "../components/TextInput";
 import AuthLayout from "../layouts/AuthLayout";
 import { useAuth } from "../hooks/useAuth";
+import Button from "../components/ui/Button";
+import PasswordInput from "../components/ui/PasswordInput";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -45,9 +48,11 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(form);
+      toast.success("Welcome back. You are signed in.");
       navigate("/dashboard");
     } catch (error) {
       setServerError(error?.response?.data?.detail || "Login failed.");
+      toast.error(error?.response?.data?.detail || "Login failed.");
     } finally {
       setSubmitting(false);
     }
@@ -59,7 +64,7 @@ export default function LoginPage() {
         title="Welcome back"
         subtitle="Sign in to continue to FutureCampus and track your admission journey."
       >
-        <form onSubmit={onSubmit} noValidate>
+        <form onSubmit={onSubmit} noValidate className="space-y-4">
           <TextInput
             label="Email"
             name="email"
@@ -70,10 +75,9 @@ export default function LoginPage() {
             error={errors.email}
           />
 
-          <TextInput
+          <PasswordInput
             label="Password"
             name="password"
-            type="password"
             value={form.password}
             onChange={onChange}
             placeholder="Enter your password"
@@ -82,13 +86,9 @@ export default function LoginPage() {
 
           {serverError ? <p className="mb-4 text-sm text-red-600">{serverError}</p> : null}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white transition hover:translate-y-[-1px] hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? "Signing in..." : "Login"}
-          </button>
+          <Button type="submit" disabled={submitting} className="w-full py-3">
+            {submitting ? "Authenticating…" : "Continue"}
+          </Button>
         </form>
 
         <p className="mt-6 text-sm text-slate-600">
