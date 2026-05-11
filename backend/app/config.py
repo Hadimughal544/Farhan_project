@@ -18,6 +18,20 @@ class Settings(BaseSettings):
 
     first_superuser_email: EmailStr | None = None
 
+    # Optional AI integrations for roadmap/chat enhancements.
+    ai_provider: str = "local"
+    enable_external_ai: bool = False
+    openai_api_key: str | None = None
+    gemini_api_key: str | None = None
+    # Cloudinary credentials for avatar uploads
+    cloudinary_cloud_name: str | None = None
+    cloudinary_api_key: str | None = None
+    cloudinary_api_secret: str | None = None
+
+    # Email settings for admin bulk email
+    # Uses no-reply address - no SMTP configuration required
+    smtp_from_email: str = "noreply admin@futurecampus"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

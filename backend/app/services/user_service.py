@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.auth.security import hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import UserLogin, UserProfileUpdate, UserRegister
+from app.services.avatar_service import AvatarService
 
 
 class UserService:
@@ -25,10 +26,20 @@ class UserService:
             email=payload.email,
             password=hash_password(payload.password),
             role="student",
+            gender=payload.gender or "unspecified",
         )
         db.add(user)
         db.commit()
         db.refresh(user)
+        # generate DiceBear avatar and upload to Cloudinary (best-effort)
+        try:
+            avatar_url = AvatarService.generate_and_upload_from_name(payload.full_name, payload.gender)
+            user.avatar_url = avatar_url
+            db.commit()
+            db.refresh(user)
+        except Exception:
+            # fail silently for now; user still registered without avatar
+            pass
         return user
 
     @staticmethod
@@ -59,6 +70,12 @@ class UserService:
     @staticmethod
     def list_users(db: Session) -> list[User]:
         return db.query(User).order_by(User.created_at.desc()).all()
+
+    @staticmethod
+    def get_users_by_ids(db: Session, user_ids: list[int]) -> list[User]:
+        if not user_ids:
+            return []
+        return db.query(User).filter(User.id.in_(user_ids)).all()
 
     @staticmethod
     def update_user_role(db: Session, user_id: int, role: str) -> User | None:

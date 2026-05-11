@@ -6,9 +6,12 @@ import time
 from app.config import settings
 from app.database import Base, engine
 from app.middleware.error_handler import register_exception_handlers
-from app.routes import auth_routes, user_routes, prediction_routes, admin_routes, chatbot_routes
+from app.routes import auth_routes, user_routes, prediction_routes, admin_routes, chatbot_routes, advanced_routes
 from app.models.university import University  # Import to register model with Base
 from app.models.chatbot_kb_entry import ChatbotKnowledgeEntry  # Import to register model with Base
+from app.models.saved_university import SavedUniversity  # Import to register model with Base
+from app.models.prediction_history import PredictionHistory  # Import to register model with Base
+from app.models.merit_trend import MeritTrend  # Import to register model with Base
 
 # Setup basic logging (console only)
 logging.basicConfig(
@@ -59,6 +62,7 @@ app.include_router(user_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(prediction_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(admin_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(chatbot_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(advanced_routes.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")

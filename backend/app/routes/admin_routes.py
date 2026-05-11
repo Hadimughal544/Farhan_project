@@ -5,7 +5,8 @@ from app.auth.dependencies import get_current_user
 from app.database import get_db
 from app.models.user import User
 from app.schemas.university import UniversityCreate, UniversityResponse, UniversityUpdate
-from app.schemas.user import AdminUserRoleUpdate, UserResponse
+from app.schemas.user import AdminBulkEmailRequest, AdminBulkEmailResponse, AdminUserRoleUpdate, UserResponse
+from app.services.email_service import EmailService
 from app.services.university_service import UniversityService
 from app.services.user_service import UserService
 
@@ -117,3 +118,42 @@ def delete_user(
     deleted = UserService.delete_user(db, user_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
+
+
+@router.post("/users/send-email", response_model=AdminBulkEmailResponse)
+def send_bulk_email_to_users(
+    payload: AdminBulkEmailRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    ensure_admin(current_user)
+
+    if payload.send_to == "all":
+        users = UserService.list_users(db)
+    else:
+        if not payload.user_ids:
+            raise HTTPException(status_code=400, detail="Select at least one user")
+        users = UserService.get_users_by_ids(db, payload.user_ids)
+
+    recipient_emails = []
+    skipped = 0
+    for u in users:
+        if not u.email:
+            skipped += 1
+            continue
+        recipient_emails.append(u.email)
+
+    if not recipient_emails:
+        raise HTTPException(status_code=400, detail="No valid recipient emails found")
+
+    EmailService.send_bulk_email(
+        recipients=recipient_emails,
+        subject=payload.subject,
+        body=payload.body,
+    )
+
+    return {
+        "recipients": len(recipient_emails),
+        "subject": payload.subject,
+        "skipped_users": skipped,
+    }

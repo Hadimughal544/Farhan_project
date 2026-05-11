@@ -8,6 +8,7 @@ class UserRegister(BaseModel):
     full_name: str = Field(min_length=2, max_length=150)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    gender: str | None = Field(default="unspecified", description="Optional gender used for avatar seed")
 
 
 class UserLogin(BaseModel):
@@ -22,6 +23,8 @@ class UserResponse(BaseModel):
     full_name: str
     email: EmailStr
     role: str
+    gender: str | None
+    avatar_url: str | None
     created_at: datetime
 
 
@@ -60,3 +63,16 @@ class AdmissionPredictionResponse(BaseModel):
 
 class AdminUserRoleUpdate(BaseModel):
     role: str = Field(pattern="^(admin|student)$")
+
+
+class AdminBulkEmailRequest(BaseModel):
+    send_to: str = Field(default="all", pattern="^(all|selected)$")
+    user_ids: list[int] = Field(default_factory=list)
+    subject: str = Field(min_length=2, max_length=180)
+    body: str = Field(min_length=3, max_length=20000)
+
+
+class AdminBulkEmailResponse(BaseModel):
+    recipients: int
+    subject: str
+    skipped_users: int = 0

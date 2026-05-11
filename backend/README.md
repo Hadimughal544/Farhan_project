@@ -33,3 +33,26 @@ uvicorn app.main:app --reload
 ## Neon Setup
 
 Paste Neon connection URL into `DATABASE_URL` inside `.env` and make sure `sslmode=require` is present.
+
+## Optional AI Environment Variables
+
+Add these to `backend/.env` for advanced advisor features:
+
+- `AI_PROVIDER=local` (or `openai`, `gemini`)
+- `ENABLE_EXTERNAL_AI=false`
+- `OPENAI_API_KEY=`
+- `GEMINI_API_KEY=`
+
+When `ENABLE_EXTERNAL_AI=false`, the platform uses local deterministic recommendations.
+
+## New Advanced API Endpoints
+
+- `POST /api/v1/advanced/scholarships/recommendations`
+- `POST /api/v1/advanced/career/recommend`
+- `POST /api/v1/advanced/roadmap/generate`
+- `POST /api/v1/advanced/universities/compare`
+- `GET /api/v1/advanced/merit-trends`
+- `POST /api/v1/advanced/admin/merit-trends` (admin)
+- `GET /api/v1/advanced/student-dashboard`
+- `GET /api/v1/advanced/prediction-history`
+- `GET /api/v1/advanced/saved-universities`
